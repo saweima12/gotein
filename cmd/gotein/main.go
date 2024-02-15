@@ -24,16 +24,16 @@ func main() {
 		panic(err)
 	}
 
+	// initialize bot proxy.
 	cfg := cfg.Config()
 
-	bot, err := tgbot.NewBot(&cfg.BotConfig, &handler.BotHandler{})
+	h := handler.New(&cfg.MeiliConfig)
+	bot, err := tgbot.NewBot(&cfg.BotConfig, h)
 	if err != nil {
 		panic(err)
 	}
-
-	if cfg.IsDev {
-		logger.InitLogger(cfg.IsDev)
-	}
+	// Initialize logger.
+	logger.InitLogger(cfg.IsDev)
 
 	// Handle signal.
 	c := make(chan os.Signal, 1)

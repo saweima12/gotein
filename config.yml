@@ -4,3 +4,7 @@ bot_config:
   bot_token: ""
   hook_url: "https://"
   is_webhook: false
+
+meili_config:
+  host: "http://127.0.0.1:7700"
+  key: ""

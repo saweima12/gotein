@@ -9,5 +9,5 @@ func GetInlineHelper(q *telego.InlineQuery) *InlineHelper {
 }
 
 type InlineHelper struct {
-	q *telego.InlineQuery
+	*telego.InlineQuery
 }
