@@ -1,0 +1,6 @@
+is_dev: true
+owner_id: 0
+bot_config:
+  bot_token: ""
+  hook_url: "https://"
+  is_webhook: false
