@@ -9,6 +9,8 @@ import (
 	"os"
 	"os/signal"
 	"syscall"
+
+	"github.com/mymmrac/telego"
 )
 
 func main() {
@@ -24,11 +26,16 @@ func main() {
 		panic(err)
 	}
 
-	// initialize bot proxy.
 	cfg := cfg.Config()
+	// Initialize bot
+	api, err := telego.NewBot(cfg.BotToken)
+	if err != nil {
+		panic(err)
+	}
 
-	h := handler.New(&cfg.MeiliConfig)
-	bot, err := tgbot.NewBot(&cfg.BotConfig, h)
+	// Initialize handler & worker
+	h := handler.New(api, cfg)
+	proxy, err := tgbot.NewWorker(api, h)
 	if err != nil {
 		panic(err)
 	}
@@ -40,9 +47,9 @@ func main() {
 	signal.Notify(c, syscall.SIGINT, syscall.SIGTERM)
 
 	if cfg.IsWebhook {
-		err = bot.ViaWebhook(c)
+		err = proxy.ViaWebhook(c)
 	} else {
-		err = bot.ViaPolling(c)
+		err = proxy.ViaPolling(c)
 	}
 
 	if err != nil {

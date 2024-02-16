@@ -1,16 +1,18 @@
 package repositories
 
 import (
-	"fmt"
 	"gotein/data"
 	"gotein/data/models"
+	"gotein/libs/cjson"
 
 	"github.com/meilisearch/meilisearch-go"
 )
 
 type MeiliRepo interface {
-	GetUserList(docKey string) ([]string, error)
 	SearchMedia(keyword string) ([]*models.MediaDoc, error)
+	GetUserList(docKey string) ([]string, error)
+	SetUserList(docKey string, val *models.UserList) error
+	GetMedia(indexUid, uid string) (*models.MediaDoc, error)
 }
 
 func NewMeiliRepo(client meilisearch.ClientInterface) MeiliRepo {
@@ -26,12 +28,24 @@ type meiliRepo struct {
 func (repo *meiliRepo) SearchMedia(keyword string) ([]*models.MediaDoc, error) {
 	index := repo.cli.Index(data.INDEX_CACHED)
 	resp, err := index.Search(keyword, &meilisearch.SearchRequest{Limit: 20})
-	fmt.Println(resp, err)
+
+	rtn := make([]*models.MediaDoc, 0, len(resp.Hits))
+
+	for i := range resp.Hits {
+		var media *models.MediaDoc
+		bytes, _ := cjson.Marshal(resp.Hits[i])
+		err := cjson.Unmarshal(bytes, &media)
+		if err != nil {
+			continue
+		}
+		rtn = append(rtn, media)
+	}
+
 	if err != nil {
 		return nil, err
 	}
 
-	return nil, nil
+	return rtn, nil
 }
 
 func (repo *meiliRepo) GetUserList(docKey string) ([]string, error) {
@@ -44,4 +58,27 @@ func (repo *meiliRepo) GetUserList(docKey string) ([]string, error) {
 	}
 
 	return resp.Users, nil
+}
+
+func (repo *meiliRepo) SetUserList(docKey string, val *models.UserList) error {
+	index := repo.cli.Index(data.INDEX_CONFIG)
+
+	_, err := index.UpdateDocuments([]any{val})
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (repo *meiliRepo) GetMedia(indexUid string, uid string) (*models.MediaDoc, error) {
+	index := repo.cli.Index(indexUid)
+
+	var resp models.MediaDoc
+	err := index.GetDocument(uid, nil, &resp)
+	if err != nil {
+		return nil, err
+	}
+
+	return &resp, nil
 }

@@ -1,8 +1,9 @@
 package cfg
 
-type configuration struct {
-	IsDev       bool  `yaml:"is_dev"`
-	OwnerID     int64 `yaml:"owner_id"`
+type Configuration struct {
+	IsDev       bool   `yaml:"is_dev"`
+	OwnerID     int64  `yaml:"owner_id"`
+	DomainURL   string `yaml:"domain_url"`
 	BotConfig   `yaml:"bot_config"`
 	MeiliConfig `yaml:"meili_config"`
 }

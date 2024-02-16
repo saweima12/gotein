@@ -8,12 +8,12 @@ import (
 )
 
 var (
-	cfg     *configuration
+	cfg     *Configuration
 	textMap = make(textLangMap)
 	GetText = textMap.GetText
 )
 
-func Config() *configuration {
+func Config() *Configuration {
 	return cfg
 }
 
