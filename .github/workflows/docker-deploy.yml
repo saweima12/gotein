@@ -13,7 +13,12 @@ jobs:
         run: make build
       
       - name: list build directory contents
-        run: ls -l .
+        run: |
+          pwd
+          ls -l .
+
+      - name: Set permissions for build directory
+        run: chmod -R 777 .
 
       - name: Copy image to remote.
         uses: appleboy/scp-action@master
