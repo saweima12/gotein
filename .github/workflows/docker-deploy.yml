@@ -26,7 +26,7 @@ jobs:
           key: ${{ secrets.LINODE_SECRET }}
           port: 10022
           source: "./build/gotein.tar"
-          target: "/tmp"
+          target: "~"
 
       - name: Deploy to VPS
         uses: appleboy/ssh-action@master
@@ -36,5 +36,5 @@ jobs:
           key: ${{ secrets.LINODE_SECRET }}
           port: 10022
           script: |
-            docker load -i /tmp/gotein.tar
+            docker load -i $HOME/gotein.tar
             systemctl restart ${{ secrets.SERVICE_NAME }}
