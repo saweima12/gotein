@@ -12,6 +12,12 @@ jobs:
       - name: Build dokcer image
         run: make build
       
+      - name: Set permissions for build directory
+        run: chmod -R 777 ./build
+
+      - name: list build directory contents
+        run: ls -l ./build
+
       - name: Copy image to remote.
         uses: appleboy/scp-action@master
         with:
