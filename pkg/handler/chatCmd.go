@@ -40,7 +40,7 @@ func (bo *BotHandler) akCommand(m *tgbot.MsgHelper, arg string) {
 	msg := tu.Messagef(m.Chat.ChatID(), cfg.GetText(cfg.AK_SUCCESS), kStr)
 	_, err := bo.API().SendMessage(msg)
 
-	logger.Infof("[%s] AddKeyword for %s input: %s", m.FullName(), req.Uid, kStr)
+	logger.Infof("[%s] AddKeyword for %s input: %v", m.FullName(), req.Uid, cur.Keywords)
 	if err != nil {
 		logger.Errorf("Error Addkeyword response send failed, err: %v", err)
 	}
@@ -72,7 +72,7 @@ func (bo *BotHandler) skCommand(m *tgbot.MsgHelper, arg string) {
 	cur := bo.mediaServ.SetKeyword(req)
 	kStr, _ := cjson.MarshalToString(cur.Keywords)
 
-	logger.Infof("[%s] SetKeyword for %s input: %s", m.FullName(), req.Uid, kStr)
+	logger.Infof("[%s] SetKeyword for %s input: %v", m.FullName(), req.Uid, cur.Keywords)
 	msg := tu.Messagef(m.Chat.ChatID(), cfg.GetText(cfg.SK_SUCCESS), kStr).
 		WithReplyParameters(&telego.ReplyParameters{
 			MessageID: reply.MessageID,

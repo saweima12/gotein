@@ -45,6 +45,7 @@ func (us *userServ) AddUser(doc string, userId string) error {
 func (us *userServ) IsAllowUser(uid string) bool {
 	obj, err := us.meiliRepo.GetUserList(data.DOC_WHITELIST)
 	if err != nil {
+		logger.Errorf("Error CheckUserAllow failed err: %v", err)
 		return false
 	}
 	usersSet := utils.SliceToSet[string](obj.Users)
@@ -58,6 +59,7 @@ func (us *userServ) IsAllowUser(uid string) bool {
 func (us *userServ) IsListenUser(uid string) bool {
 	obj, err := us.meiliRepo.GetUserList(data.DOC_LISTEN)
 	if err != nil {
+		logger.Errorf("Error CheckUserListen failed err: %v", err)
 		return false
 	}
 	usersSet := utils.SliceToSet[string](obj.Users)

@@ -79,6 +79,8 @@ func (bo *BotHandler) handleInline(m *tgbot.InlineHelper) {
 	params := tu.InlineQuery(m.ID, result...)
 	// Send answer
 	err := bo.API().AnswerInlineQuery(params)
+
+	logger.Infof("[%s] Query: %s", m.FullName(), queryStr)
 	if err != nil {
 		logger.GetLogger().Errorf("Answer inlineQuery failed, err: %v", err)
 	}

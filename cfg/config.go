@@ -1,6 +1,7 @@
 package cfg
 
 type Configuration struct {
+	Port        int    `yaml:"port"`
 	IsDev       bool   `yaml:"is_dev"`
 	OwnerID     int64  `yaml:"owner_id"`
 	DomainURL   string `yaml:"domain_url"`

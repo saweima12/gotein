@@ -1,4 +1,5 @@
 is_dev: true
+port: 8001
 owner_id: 0
 register_key: ""
 domain_url: "https://example.com"

@@ -46,6 +46,8 @@ func main() {
 	c := make(chan os.Signal, 1)
 	signal.Notify(c, syscall.SIGINT, syscall.SIGTERM)
 
+	api.DeleteWebhook(&telego.DeleteWebhookParams{})
+
 	if cfg.IsWebhook {
 		err = proxy.ViaWebhook(c)
 	} else {
@@ -55,5 +57,7 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
+
+	logger.Info("gotein service shutdown....")
 
 }

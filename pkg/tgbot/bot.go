@@ -1,6 +1,7 @@
 package tgbot
 
 import (
+	"fmt"
 	"gotein/cfg"
 	"gotein/logger"
 	"os"
@@ -48,23 +49,26 @@ func (te *TeleBot) ViaWebhook(stopCh chan os.Signal) error {
 
 	// Receive information about webhook
 	info, _ := te.api.GetWebhookInfo()
+	portStr := fmt.Sprintf(":%v", te.cfg.Port)
 	logger.Infof("Webhook Info: %+v\n", info)
 
-	updates, err := te.api.UpdatesViaWebhook("/bot" + te.api.Token())
-	if err != nil {
-		return err
-	}
+	logger.Infof(`Listen port -> "%v"`, portStr)
 
 	go func() {
-		te.api.StartWebhook(":443")
+		te.api.StartWebhook(portStr)
 	}()
 
 	defer func() {
 		te.api.StopWebhook()
 	}()
 
-	te.reciveUpdate(updates, stopCh)
+	updates, err := te.api.UpdatesViaWebhook("/bot" + te.api.Token())
+	if err != nil {
+		return err
+	}
+
 	logger.Info("Start to recive webhhok updates.")
+	te.reciveUpdate(updates, stopCh)
 	return nil
 }
 

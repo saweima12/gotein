@@ -37,9 +37,11 @@ func (bo *BotHandler) listenCommand(m *tgbot.MsgHelper, arg string) {
 	helper := tgbot.GetMsgHelper(reply)
 	logger.Infof("[%s] Listen success -- ", helper.FullName())
 
-	msg := tu.Messagef(m.Chat.ChatID(), cfg.GetText(cfg.LISTEN_SUCCESS), m.FullName())
+	msg := tu.Messagef(m.Chat.ChatID(), cfg.GetText(cfg.LISTEN_SUCCESS), helper.FullName()).
+		WithReplyParameters(&telego.ReplyParameters{
+			MessageID: reply.MessageID,
+		})
 	bo.API().SendMessage(msg)
-
 }
 
 func (bo *BotHandler) addkeywordCommand(m *tgbot.MsgHelper, arg string) {
