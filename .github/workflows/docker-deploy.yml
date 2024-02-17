@@ -25,7 +25,7 @@ jobs:
           username: ${{ secrets.LINODE_ACCOUNT }}
           key: ${{ secrets.LINODE_SECRET }}
           port: 10022
-          source: "./build/gotein.tar"
+          source: "./gotein.tar"
           target: "~"
 
       - name: Deploy to VPS

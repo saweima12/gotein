@@ -7,7 +7,7 @@ build:
 	docker buildx build --platform linux/amd64 . -t $(IMG_NAME)
 	yes | docker image prune --filter label=stage=builder 
 	yes | docker image prune --filter label=stage=runtime 
-	docker save -o ./build/$(IMG_NAME).tar $(IMG_NAME)
+	docker save -o ./$(IMG_NAME).tar $(IMG_NAME)
 
 build_local:
 	mkdir -p ./build
