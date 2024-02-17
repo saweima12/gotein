@@ -1,0 +1,22 @@
+name: docker-deploy
+on:
+  push: [main]
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build dokcer image
+        run: make build
+      
+      - name: Copy image to remote.
+        uses: appleboy/scp-action@master
+        with:
+          host: ${{ secrets.LINODE_HOST }}
+          username: ${{ secrets.LINODE_ACCOUNT }}
+          key: ${{ secrets.LINODE_SECRET }}
+          port: 22
+          source: "./build/gotein.tar"
+          target: "/tmp"
