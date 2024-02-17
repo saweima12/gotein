@@ -39,4 +39,4 @@ jobs:
           port: 10022
           script: |
             docker load -i $HOME/gotein.tar
-            systemctl restart ${{ secrets.SERVICE_NAME }}
+            sudo systemctl restart ${{ secrets.SERVICE_NAME }}
