@@ -18,6 +18,9 @@ type BotHandler struct {
 	mediaServ services.MediaServ
 	userServ  services.UserServ
 	cacheServ services.CacheServ
+
+	chatCmdMap  tgbot.CommandMap
+	groupCmdMap tgbot.CommandMap
 }
 
 func New(bot *telego.Bot, cfg *cfg.Configuration) *BotHandler {
@@ -28,16 +31,33 @@ func New(bot *telego.Bot, cfg *cfg.Configuration) *BotHandler {
 	})
 
 	meiliRepo := repositories.NewMeiliRepo(meiliCli)
-	cacheServ := services.NewCacheServ(bot)
+	cacheServ := services.NewCacheServ(bot, cfg)
 	userServ := services.NewUserServ(meiliRepo)
 	mediaServ := services.NewMediaServ(meiliRepo, cacheServ, cfg)
 
-	return &BotHandler{
+	h := &BotHandler{
 		api:       bot,
+		cfg:       cfg,
 		mediaServ: mediaServ,
 		userServ:  userServ,
 		cacheServ: cacheServ,
+
+		chatCmdMap:  make(tgbot.CommandMap),
+		groupCmdMap: make(tgbot.CommandMap),
 	}
+	h.Init()
+
+	return h
+}
+
+func (bo *BotHandler) Init() {
+	bo.chatCmdMap["ak"] = bo.akCommand
+	bo.chatCmdMap["sk"] = bo.skCommand
+	bo.chatCmdMap["rm"] = bo.rmCommand
+	bo.chatCmdMap["register"] = bo.registerCommand
+
+	bo.groupCmdMap["listen"] = bo.listenCommand
+	bo.groupCmdMap["addkeyword"] = bo.addkeywordCommand
 }
 
 func (bo *BotHandler) Handle(u *telego.Update) {
@@ -60,12 +80,13 @@ func (bo *BotHandler) handleInline(m *tgbot.InlineHelper) {
 	// Send answer
 	err := bo.API().AnswerInlineQuery(params)
 	if err != nil {
-		logger.Errorf("Answer inlineQuery failed, err: %v", err)
+		logger.GetLogger().Errorf("Answer inlineQuery failed, err: %v", err)
 	}
 }
 
 func (bo *BotHandler) handleMessage(m *tgbot.MsgHelper) {
-	if m.Chat.Type == "supergroup" {
+	logger.Debug(m.Chat.Type)
+	if m.Chat.Type == "supergroup" || m.Chat.Type == "channel" {
 		bo.handleGroupMessage(m)
 	} else {
 		bo.handleChatMessage(m)

@@ -1,38 +1,49 @@
 package logger
 
 import (
+	"sync"
+
 	"go.uber.org/zap"
 )
 
-var instance *zap.SugaredLogger
+var (
+	instance *zap.SugaredLogger
+	once     sync.Once
+)
 
 // Initialize logger instance.
 func InitLogger(isDev bool) error {
-	var logger *zap.Logger
 	var err error
+	once.Do(func() {
+		var logger *zap.Logger
 
-	if isDev {
-		logger, err = zap.NewDevelopment(
-			zap.AddCaller(),
-			zap.AddCallerSkip(1),
-		)
-	} else {
-		logger, err = zap.NewProduction(
-			zap.AddCaller(),
-			zap.AddCallerSkip(1),
-		)
-	}
-
-	if err != nil {
-		return err
-	}
-	instance = logger.Sugar()
-	return nil
+		if isDev {
+			logger, err = zap.NewDevelopment(
+				zap.AddCaller(),
+				zap.AddCallerSkip(1),
+			)
+		} else {
+			logger, err = zap.NewProduction(
+				zap.AddCaller(),
+				zap.AddCallerSkip(1),
+			)
+		}
+		instance = logger.Sugar()
+	})
+	return err
 }
 
-/// ---
-/// Wrapper Function
-/// ----
+// / ---
+// / Wrapper Function
+// / ----
+func GetLogger() *zap.SugaredLogger {
+	once.Do(func() {
+		if instance == nil {
+			InitLogger(false)
+		}
+	})
+	return instance
+}
 
 func Error(args ...interface{}) {
 	instance.Error(args...)

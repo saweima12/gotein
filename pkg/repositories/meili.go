@@ -10,9 +10,12 @@ import (
 
 type MeiliRepo interface {
 	SearchMedia(keyword string) ([]*models.MediaDoc, error)
-	GetUserList(docKey string) ([]string, error)
+	GetUserList(docKey string) (*models.UserList, error)
 	SetUserList(docKey string, val *models.UserList) error
 	GetMedia(indexUid, uid string) (*models.MediaDoc, error)
+	InsertMedia(doc *models.MediaDoc) error
+	PutMedia(doc *models.MediaDoc) error
+	DeleteMedia(uid string) error
 }
 
 func NewMeiliRepo(client meilisearch.ClientInterface) MeiliRepo {
@@ -48,16 +51,16 @@ func (repo *meiliRepo) SearchMedia(keyword string) ([]*models.MediaDoc, error) {
 	return rtn, nil
 }
 
-func (repo *meiliRepo) GetUserList(docKey string) ([]string, error) {
+func (repo *meiliRepo) GetUserList(docKey string) (*models.UserList, error) {
 	var resp *models.UserList
 
 	index := repo.cli.Index(data.INDEX_CONFIG)
 	err := index.GetDocument(docKey, nil, &resp)
 	if err != nil {
-		return []string{}, err
+		return nil, err
 	}
 
-	return resp.Users, nil
+	return resp, nil
 }
 
 func (repo *meiliRepo) SetUserList(docKey string, val *models.UserList) error {
@@ -76,9 +79,41 @@ func (repo *meiliRepo) GetMedia(indexUid string, uid string) (*models.MediaDoc, 
 
 	var resp models.MediaDoc
 	err := index.GetDocument(uid, nil, &resp)
+
 	if err != nil {
+		castErr := err.(*meilisearch.Error)
+		if castErr.StatusCode == 404 {
+			return nil, nil
+		}
 		return nil, err
 	}
 
 	return &resp, nil
+}
+
+func (repo *meiliRepo) InsertMedia(item *models.MediaDoc) error {
+	index := repo.cli.Index(data.INDEX_CACHED)
+	_, err := index.AddDocuments([]any{item})
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func (repo *meiliRepo) PutMedia(doc *models.MediaDoc) error {
+	index := repo.cli.Index(data.INDEX_CACHED)
+	_, err := index.UpdateDocuments([]any{doc})
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func (repo *meiliRepo) DeleteMedia(uid string) error {
+	index := repo.cli.Index(data.INDEX_CACHED)
+	_, err := index.DeleteDocument(uid)
+	if err != nil {
+		return err
+	}
+	return nil
 }

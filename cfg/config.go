@@ -4,6 +4,8 @@ type Configuration struct {
 	IsDev       bool   `yaml:"is_dev"`
 	OwnerID     int64  `yaml:"owner_id"`
 	DomainURL   string `yaml:"domain_url"`
+	CacheDir    string `yaml:"cache_dir"`
+	RegisterKey string `yaml:"register_key"`
 	BotConfig   `yaml:"bot_config"`
 	MeiliConfig `yaml:"meili_config"`
 }

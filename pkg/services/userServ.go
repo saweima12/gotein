@@ -2,13 +2,13 @@ package services
 
 import (
 	"gotein/data"
+	"gotein/logger"
 	"gotein/pkg/repositories"
 	"gotein/utils"
 )
 
 type UserServ interface {
-	AddUser(uid string)
-	AddListener(uid string)
+	AddUser(doc string, userId string) error
 	IsAllowUser(uid string) bool
 	IsListenUser(uid string) bool
 }
@@ -23,20 +23,31 @@ type userServ struct {
 	meiliRepo repositories.MeiliRepo
 }
 
-func (us *userServ) AddUser(uid string) {
-	panic("not implemented") // TODO: Implement
-}
+func (us *userServ) AddUser(doc string, userId string) error {
+	obj, err := us.meiliRepo.GetUserList(doc)
+	if err != nil {
+		return err
+	}
 
-func (us *userServ) AddListener(uid string) {
-	panic("not implemented") // TODO: Implement
+	set := utils.SliceToSet[string](obj.Users)
+	set[userId] = struct{}{}
+	nlist := utils.SetToSlice[string](set)
+	obj.Users = nlist
+
+	err = us.meiliRepo.SetUserList(doc, obj)
+	if err != nil {
+		logger.Errorf("Error AddUser failed, err: %v", err)
+		return err
+	}
+	return nil
 }
 
 func (us *userServ) IsAllowUser(uid string) bool {
-	usersList, err := us.meiliRepo.GetUserList(data.DOC_WHITELIST)
+	obj, err := us.meiliRepo.GetUserList(data.DOC_WHITELIST)
 	if err != nil {
 		return false
 	}
-	usersSet := utils.SliceToSet[string](usersList)
+	usersSet := utils.SliceToSet[string](obj.Users)
 	if _, ok := usersSet[uid]; !ok {
 		return false
 	}
@@ -45,11 +56,11 @@ func (us *userServ) IsAllowUser(uid string) bool {
 }
 
 func (us *userServ) IsListenUser(uid string) bool {
-	usersList, err := us.meiliRepo.GetUserList(data.DOC_LISTEN)
+	obj, err := us.meiliRepo.GetUserList(data.DOC_LISTEN)
 	if err != nil {
 		return false
 	}
-	usersSet := utils.SliceToSet[string](usersList)
+	usersSet := utils.SliceToSet[string](obj.Users)
 	if _, ok := usersSet[uid]; !ok {
 		return false
 	}

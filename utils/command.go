@@ -13,8 +13,12 @@ func GetCommand(prefix string, text string) (cmd string, argStr string, ok bool)
 
 	shards := strings.Split(text, " ")
 
-	if len(shards) > 1 {
+	if len(shards) > 0 {
 		cmd = shards[0][1:]
+	}
+
+	if len(shards) == 1 {
+		return cmd, "", true
 	}
 
 	// shards >= 2

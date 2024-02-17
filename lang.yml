@@ -21,6 +21,9 @@ media_new: |
   /ak - 新增圖檔的關鍵字。
 
 
+group_add: |
+  新增關鍵字成功。當前關鍵字為： %s
+
 help_msg: |
   *使用方式*
   - 傳送一張貼圖或是 GIF 可以取得當前登錄的關鍵字及狀態。
@@ -31,9 +34,14 @@ help_msg: |
   - 關鍵字必須用半形逗號,隔開中間不可有其他的空白。
   - 關鍵字添加後會由資料庫處理索引，需要幾分鐘的時間。
 
-register_success: "註冊成功"
+listen_success: "開始接收 %s 指令"
+register_success: "註冊成功，開啟互動模式。"
+
+sk_success: "設置關鍵字成功。新的關鍵字組為：%s"
+ak_success: "新增關鍵字成功。新的關鍵字組為：%s"
+rm_success: "移除 Media 成功。"
 
 err_internal: "遇到未知錯誤，請聯繫管理者。"
-
-sk_need_reply: "需要 reply 一個貼圖或是 GIF"
-sk_params_err : "關鍵字必須至少有一組並且使用半形逗號,隔開。"
+err_need_reply: "需要 reply 一個貼圖或是 GIF"
+err_params_need : "關鍵字必須至少有一組並且使用半形逗號,隔開。"
+err_not_found:  "找不到對應的貼圖或是 GIF, 請重新登錄。"

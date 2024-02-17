@@ -1,6 +1,7 @@
 package tgbot
 
 import (
+	"gotein/cfg"
 	"gotein/logger"
 	"os"
 
@@ -10,15 +11,17 @@ import (
 
 type TeleBot struct {
 	id      int64
+	cfg     *cfg.Configuration
 	api     *telego.Bot
 	pool    *ants.PoolWithFunc
 	handler UpdateHandler
 }
 
-func NewWorker(api *telego.Bot, h UpdateHandler) (*TeleBot, error) {
+func NewWorker(api *telego.Bot, h UpdateHandler, cfg *cfg.Configuration) (*TeleBot, error) {
 	result := &TeleBot{
 		api:     api,
 		handler: h,
+		cfg:     cfg,
 	}
 
 	// Create handler pool.
@@ -36,11 +39,31 @@ func NewWorker(api *telego.Bot, h UpdateHandler) (*TeleBot, error) {
 }
 
 func (te *TeleBot) ViaWebhook(stopCh chan os.Signal) error {
-	err := te.api.SetWebhook(&telego.SetWebhookParams{})
+	err := te.api.SetWebhook(&telego.SetWebhookParams{
+		URL: te.cfg.HookURL + "/bot" + te.api.Token(),
+	})
 	if err != nil {
 		return err
 	}
 
+	// Receive information about webhook
+	info, _ := te.api.GetWebhookInfo()
+	logger.Infof("Webhook Info: %+v\n", info)
+
+	updates, err := te.api.UpdatesViaWebhook("/bot" + te.api.Token())
+	if err != nil {
+		return err
+	}
+
+	go func() {
+		te.api.StartWebhook(":443")
+	}()
+
+	defer func() {
+		te.api.StopWebhook()
+	}()
+
+	te.reciveUpdate(updates, stopCh)
 	logger.Info("Start to recive webhhok updates.")
 	return nil
 }

@@ -1,8 +1,11 @@
 is_dev: true
 owner_id: 0
+register_key: ""
+domain_url: "https://example.com"
+cache_dir: "static/asset"
 bot_config:
   bot_token: ""
-  hook_url: "https://"
+  hook_url: "https://example.com/api"
   is_webhook: false
 
 meili_config:

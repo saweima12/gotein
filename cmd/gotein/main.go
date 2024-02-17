@@ -35,7 +35,7 @@ func main() {
 
 	// Initialize handler & worker
 	h := handler.New(api, cfg)
-	proxy, err := tgbot.NewWorker(api, h)
+	proxy, err := tgbot.NewWorker(api, h, cfg)
 	if err != nil {
 		panic(err)
 	}
