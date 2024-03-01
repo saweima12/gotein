@@ -1,0 +1,28 @@
+version: '3.7'
+
+volumes:
+  meili_data: { driver: local }
+
+services:
+  meilisearch:
+    container_name: meilisearch_common
+    image: getmeili/meilisearch:v0.28
+    ports:
+      - 7700:7700
+    volumes:
+      - meili_data:/meili_data
+      - ./attach:/meili_data/attach
+    command: 'meilisearch --env="development"'
+    environment:
+      - MEILI_MASTER_KEY=meilise
+    logging:
+      driver: none
+  gotein:
+    container_name: gotein
+    image: gotein:latest
+    ports: 
+      - 8001:8001
+    volumes:
+      - ./config.yml:/app/config.yml
+      - ./static:/app/static
+
